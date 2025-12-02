@@ -1,5 +1,6 @@
 package com.devtools.requestbin.controller;
 
+import com.devtools.requestbin.dto.BinDetailsResponse;
 import com.devtools.requestbin.dto.BinResponse;
 import com.devtools.requestbin.dto.CreateBinRequest;
 import com.devtools.requestbin.service.BinService;
@@ -25,6 +26,12 @@ public class BinController {
   @GetMapping("/{uniqueUrl}")
   public ResponseEntity<BinResponse> getBin(@PathVariable String uniqueUrl) {
     BinResponse response = binService.getBinByUniqueUrl(uniqueUrl);
+    return ResponseEntity.ok(response);
+  }
+
+  @GetMapping("/{uniqueUrl}/details")
+  public ResponseEntity<BinDetailsResponse> getBinDetails(@PathVariable String uniqueUrl) {
+    BinDetailsResponse response = binService.getBinDetailsWithRequests(uniqueUrl);
     return ResponseEntity.ok(response);
   }
 
