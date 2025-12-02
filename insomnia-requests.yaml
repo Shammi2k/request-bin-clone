@@ -1,0 +1,108 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: request-bin-clone
+meta:
+  id: wrk_bab5cd97ae2644e5a7ea04090b919e1c
+  created: 1764649997584
+  modified: 1764649997584
+  description: ""
+collection:
+  - name: Bin
+    meta:
+      id: fld_be8290762b164c03bf89279f400d561a
+      created: 1764650459965
+      modified: 1764650492939
+      sortKey: -1764650459965
+      description: ""
+    children:
+      - url: "{{ _.url }}/api/bins"
+        name: CREATE Bin
+        meta:
+          id: req_d687a8a5429f4bad96e5afc58f69a2b3
+          created: 1764650003481
+          modified: 1764650604188
+          isPrivate: false
+          description: ""
+          sortKey: -1764650464604
+        method: POST
+        body:
+          mimeType: application/json
+          text: |-
+            {
+                "expiryHours": 24,
+                "maxRequests": 1000
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/api/bins/bb638f2c"
+        name: GET Bin
+        meta:
+          id: req_4780acc85e4f4dd4b2accacc89920a46
+          created: 1764650475431
+          modified: 1764650594715
+          isPrivate: false
+          description: ""
+          sortKey: -1764650464504
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/api/bins/bb638f2c"
+        name: DELETE Bin
+        meta:
+          id: req_d240250eb65b4db9939f712c2cf6999f
+          created: 1764650608006
+          modified: 1764650651269
+          isPrivate: false
+          description: ""
+          sortKey: -1764650464404
+        method: DELETE
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_ecc7cdd239690e3a6b5fb998a5aefb846c7e3105
+    created: 1764649997627
+    modified: 1764649997627
+environments:
+  name: Base Environment
+  meta:
+    id: env_ecc7cdd239690e3a6b5fb998a5aefb846c7e3105
+    created: 1764649997622
+    modified: 1764649997622
+    isPrivate: false
