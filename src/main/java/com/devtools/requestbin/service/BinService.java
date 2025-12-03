@@ -162,6 +162,77 @@ public class BinService
     return uniqueUrl;
   }
 
+  @Transactional(readOnly = true)
+  public List<CapturedRequestResponse> getRequestsForExport(String uniqueUrl)
+  {
+    Bin bin = binRepository.findByUniqueUrl(uniqueUrl)
+      .orElseThrow(() -> new BinNotFoundException(uniqueUrl));
+
+    List<CapturedRequest> requests = capturedRequestRepository
+      .findByBinIdOrderByTimestampDesc(bin.getId());
+
+    return requests.stream()
+      .map(this::mapRequestToResponse)
+      .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public String exportRequestsAsCsv(String uniqueUrl)
+  {
+    List<CapturedRequestResponse> requests = getRequestsForExport(uniqueUrl);
+
+    StringBuilder csv = new StringBuilder();
+
+    // CSV Header
+    csv.append("Timestamp,Method,IP Address,Query Params,Headers,Body\n");
+
+    // CSV Rows
+    for (CapturedRequestResponse req : requests)
+    {
+      csv.append(escapeCsv(req.getTimestamp().toString())).append(",");
+      csv.append(escapeCsv(req.getMethod())).append(",");
+      csv.append(escapeCsv(req.getIpAddress())).append(",");
+      csv.append(escapeCsv(jsonToString(req.getQueryParams()))).append(",");
+      csv.append(escapeCsv(jsonToString(req.getHeaders()))).append(",");
+      csv.append(escapeCsv(req.getBody() != null ? req.getBody() : "")).append("\n");
+    }
+
+    return csv.toString();
+  }
+
+  private String escapeCsv(String value)
+  {
+    if (value == null)
+    {
+      return "";
+    }
+
+    // Escape quotes and wrap in quotes if contains comma or newline
+    String escaped = value.replace("\"", "\"\"");
+    if (escaped.contains(",") || escaped.contains("\n") || escaped.contains("\""))
+    {
+      return "\"" + escaped + "\"";
+    }
+    return escaped;
+  }
+
+  private String jsonToString(Map<String, String> map)
+  {
+    if (map == null || map.isEmpty())
+    {
+      return "";
+    }
+
+    try
+    {
+      return new ObjectMapper().writeValueAsString(map);
+    }
+    catch (Exception e)
+    {
+      return "";
+    }
+  }
+
   private BinResponse mapToResponse(Bin bin)
   {
     String fullUrl = String.format("http://localhost:%s/b/%s", serverPort, bin.getUniqueUrl());

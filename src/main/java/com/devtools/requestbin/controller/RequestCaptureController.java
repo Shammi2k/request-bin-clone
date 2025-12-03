@@ -2,12 +2,16 @@ package com.devtools.requestbin.controller;
 
 import java.util.Map;
 
+import com.devtools.requestbin.dto.ApiResponse;
 import com.devtools.requestbin.dto.CapturedRequestResponse;
+import com.devtools.requestbin.dto.ReplayRequest;
 import com.devtools.requestbin.service.RequestCaptureService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,6 +48,19 @@ public class RequestCaptureController
       "timestamp", capturedRequest.getTimestamp()
     );
 
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Replay a captured request to a different URL
+   */
+  @PostMapping("/replay/{requestId}")
+  public ResponseEntity<ApiResponse<Map<String, Object>>> replayRequest(
+    @PathVariable Long requestId,
+    @RequestBody ReplayRequest replayRequest) {
+
+    Map<String, Object> result = requestCaptureService.replayRequest(requestId, replayRequest);
+    ApiResponse<Map<String, Object>> response = ApiResponse.success(result, "Request replayed successfully");
     return ResponseEntity.ok(response);
   }
 }

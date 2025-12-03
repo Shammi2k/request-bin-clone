@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.devtools.requestbin.dto.CapturedRequestResponse;
+import com.devtools.requestbin.dto.ReplayRequest;
 import com.devtools.requestbin.entity.Bin;
 import com.devtools.requestbin.entity.CapturedRequest;
 import com.devtools.requestbin.exception.BinExpiredException;
@@ -23,8 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -100,6 +106,80 @@ public class RequestCaptureService
     return requests.stream()
       .map(this::mapToResponse)
       .collect(Collectors.toList());
+  }
+
+  @Transactional(readOnly = true)
+  public Map<String, Object> replayRequest(Long requestId, ReplayRequest replayRequest) {
+    CapturedRequest capturedRequest = requestRepository.findById(requestId)
+      .orElseThrow(() -> new RuntimeException("Request not found with ID: " + requestId));
+
+    try {
+      // Parse headers
+      Map<String, String> headers = parseJsonToMap(capturedRequest.getHeaders());
+
+      // Add or override headers if provided
+      if (replayRequest.getAdditionalHeaders() != null) {
+        headers.putAll(replayRequest.getAdditionalHeaders());
+      }
+
+      // Use override body if provided, otherwise use original
+      String body = replayRequest.getOverrideBody() != null ?
+        replayRequest.getOverrideBody() : capturedRequest.getBody();
+
+      // Make HTTP request using RestTemplate
+      RestTemplate restTemplate = new RestTemplate();
+
+      HttpHeaders httpHeaders = new HttpHeaders();
+      headers.forEach(httpHeaders::add);
+
+      HttpEntity<String> entity = new HttpEntity<>(body, httpHeaders);
+
+      ResponseEntity<String> response;
+
+      // Call based on original method
+      switch (capturedRequest.getMethod()) {
+        case "POST":
+          response = restTemplate.postForEntity(replayRequest.getTargetUrl(), entity, String.class);
+          break;
+        case "PUT":
+          response = restTemplate.exchange(replayRequest.getTargetUrl(), HttpMethod.PUT, entity, String.class);
+          break;
+        case "DELETE":
+          response = restTemplate.exchange(replayRequest.getTargetUrl(), HttpMethod.DELETE, entity, String.class);
+          break;
+        case "PATCH":
+          response = restTemplate.exchange(replayRequest.getTargetUrl(), HttpMethod.PATCH, entity, String.class);
+          break;
+        case "GET":
+        default:
+          response = restTemplate.exchange(replayRequest.getTargetUrl(), HttpMethod.GET, entity, String.class);
+          break;
+      }
+
+      // Return result
+      Map<String, Object> result = new HashMap<>();
+      result.put("success", true);
+      result.put("statusCode", response.getStatusCode().value());
+      result.put("responseBody", response.getBody());
+      result.put("responseHeaders", response.getHeaders());
+      result.put("originalRequestId", requestId);
+      result.put("targetUrl", replayRequest.getTargetUrl());
+
+      log.info("Replayed request {} to {}", requestId, replayRequest.getTargetUrl());
+
+      return result;
+
+    } catch (Exception e) {
+      log.error("Error replaying request: {}", e.getMessage());
+
+      Map<String, Object> result = new HashMap<>();
+      result.put("success", false);
+      result.put("error", e.getMessage());
+      result.put("originalRequestId", requestId);
+      result.put("targetUrl", replayRequest.getTargetUrl());
+
+      return result;
+    }
   }
 
   private String extractHeaders(HttpServletRequest request)

@@ -386,6 +386,8 @@
           </div>
           <div>
             <button class="btn btn-small" onclick="refreshRequests()">🔄 Refresh</button>
+            <button class="btn btn-small btn-secondary" onclick="exportRequests('json')" style="margin-left: 10px;">📥 Export JSON</button>
+            <button class="btn btn-small btn-secondary" onclick="exportRequests('csv')" style="margin-left: 5px;">📥 Export CSV</button>
             <button class="btn btn-small btn-danger" onclick="deleteBin()" style="margin-left: 10px;">Delete</button>
           </div>
         </div>
@@ -708,6 +710,33 @@
       }
     } catch (error) {
       showToast('Network error: ' + error.message, 'error');
+    }
+  }
+
+  async function exportRequests(format) {
+    if (!currentBin) return;
+
+    try {
+      const url = `/api/bins/${currentBin.uniqueUrl}/export/${format}`;
+      const response = await fetch(url);
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `${currentBin.uniqueUrl}_requests.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        showToast(`Exported ${allRequests.length} requests as ${format.toUpperCase()}`, 'success');
+      } else {
+        showToast('Export failed', 'error');
+      }
+    } catch (error) {
+      showToast('Export error: ' + error.message, 'error');
     }
   }
 
