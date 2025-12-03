@@ -19,7 +19,7 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1400px;
       margin: 0 auto;
     }
 
@@ -41,6 +41,12 @@
       font-size: 18px;
     }
 
+    .two-column {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 30px;
+    }
+
     .card {
       background: #1E293B;
       border-radius: 12px;
@@ -58,6 +64,7 @@
       font-size: 16px;
       cursor: pointer;
       transition: all 0.2s;
+      width: 100%;
     }
 
     .btn:hover {
@@ -69,12 +76,26 @@
       transform: translateY(0);
     }
 
+    .btn-secondary {
+      background: #8B5CF6;
+    }
+
+    .btn-secondary:hover {
+      background: #7C3AED;
+    }
+
     .btn-danger {
       background: #EF4444;
     }
 
     .btn-danger:hover {
       background: #DC2626;
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 14px;
+      width: auto;
     }
 
     input, textarea {
@@ -93,18 +114,40 @@
       border-color: #06B6D4;
     }
 
-    .bin-url {
+    .bin-item {
       background: #0F172A;
       padding: 15px;
       border-radius: 8px;
-      border: 2px solid #8B5CF6;
-      margin: 20px 0;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .bin-item:hover {
+      border-color: #06B6D4;
+    }
+
+    .bin-item.active {
+      border-color: #8B5CF6;
+      background: #1E293B;
+    }
+
+    .bin-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .bin-url-small {
+      font-size: 12px;
+      color: #06B6D4;
       word-break: break-all;
     }
 
-    .bin-url a {
-      color: #06B6D4;
-      text-decoration: none;
+    .bin-stats {
+      font-size: 12px;
+      color: #94A3B8;
+      margin-top: 5px;
     }
 
     .request-item {
@@ -123,21 +166,11 @@
       margin-right: 10px;
     }
 
-    .method-GET {
-      background: #10B981;
-    }
-
-    .method-POST {
-      background: #06B6D4;
-    }
-
-    .method-PUT {
-      background: #F59E0B;
-    }
-
-    .method-DELETE {
-      background: #EF4444;
-    }
+    .method-GET { background: #10B981; }
+    .method-POST { background: #06B6D4; }
+    .method-PUT { background: #F59E0B; }
+    .method-DELETE { background: #EF4444; }
+    .method-PATCH { background: #8B5CF6; }
 
     .timestamp {
       color: #94A3B8;
@@ -157,90 +190,367 @@
       display: none;
     }
 
-    .copy-btn {
-      background: #8B5CF6;
-      padding: 8px 16px;
-      margin-left: 10px;
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
     }
 
-    .copy-btn:hover {
-      background: #7C3AED;
+    .page-btn {
+      padding: 8px 16px;
+      background: #334155;
+      border: none;
+      border-radius: 6px;
+      color: #F8FAFC;
+      cursor: pointer;
+    }
+
+    .page-btn:hover {
+      background: #475569;
+    }
+
+    .page-btn.active {
+      background: #06B6D4;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Toast Notifications */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 10px;
+      min-width: 300px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.3s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast.success {
+      border-left: 4px solid #10B981;
+    }
+
+    .toast.error {
+      border-left: 4px solid #EF4444;
+    }
+
+    .toast.info {
+      border-left: 4px solid #06B6D4;
+    }
+
+    .toast-icon {
+      font-size: 20px;
+    }
+
+    .toast-message {
+      flex: 1;
+    }
+
+    .toast-close {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 0;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOut {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+    }
+
+    .toast.removing {
+      animation: slideOut 0.3s ease-out forwards;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .search-box input {
+      padding-left: 40px;
+      margin-bottom: 0;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      color: #94A3B8;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94A3B8;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <div class="container">
   <header>
     <h1>🗄️ RequestBin</h1>
     <p class="subtitle">Capture and inspect HTTP requests in real-time</p>
   </header>
 
-  <!-- Create Bin Section -->
-  <div class="card">
-    <h2>Create New Bin</h2>
-    <p style="color: #94A3B8; margin-bottom: 20px;">
-      Generate a unique URL to capture HTTP requests
-    </p>
+  <div class="two-column">
+    <!-- Sidebar: Bins List -->
+    <div>
+      <div class="card">
+        <h2>Create New Bin</h2>
 
-    <label>Expiry Hours (1-168):</label>
-    <input type="number" id="expiryHours" value="24" min="1" max="168">
+        <label>Bin Name:</label>
+        <input type="text" id="binName" placeholder="e.g., Payment Webhook Test">
 
-    <label>Max Requests (10-10000):</label>
-    <input type="number" id="maxRequests" value="1000" min="10" max="10000">
+        <label>Expiry Hours (1-168):</label>
+        <input type="number" id="expiryHours" value="24" min="1" max="168">
 
-    <button class="btn" onclick="createBin()">Create Bin</button>
+        <label>Max Requests (10-10000):</label>
+        <input type="number" id="maxRequests" value="1000" min="10" max="10000">
 
-    <div id="binResult" class="hidden">
-      <h3 style="margin-top: 30px;">Your Bin URL:</h3>
-      <div class="bin-url">
-        <strong>URL:</strong> <a id="binUrl" href="#" target="_blank"></a>
-        <button class="btn copy-btn" onclick="copyBinUrl()">Copy</button>
+        <button class="btn" onclick="createBin()">Create Bin</button>
       </div>
-      <p style="color: #94A3B8;">
-        Send any HTTP request to this URL. All requests will be captured and logged below.
-      </p>
-      <button class="btn" onclick="loadBinDetails()" style="margin-right: 10px;">Refresh Requests</button>
-      <button class="btn btn-danger" onclick="deleteBin()">Delete Bin</button>
-    </div>
-  </div>
 
-  <!-- Captured Requests Section -->
-  <div id="requestsSection" class="card hidden">
-    <h2>Captured Requests <span id="requestCount" style="color: #06B6D4;"></span></h2>
-    <div id="requestsList"></div>
+      <div class="card">
+        <h2>My Bins</h2>
+
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchBins" placeholder="Search bins..." onkeyup="filterBins()">
+        </div>
+
+        <div id="binsList"></div>
+      </div>
+    </div>
+
+    <!-- Main: Bin Details & Requests -->
+    <div>
+      <div id="noBinSelected" class="card">
+        <div class="empty-state">
+          <div class="empty-state-icon">📭</div>
+          <h3>No Bin Selected</h3>
+          <p>Create a new bin or select one from the sidebar</p>
+        </div>
+      </div>
+
+      <div id="binDetailsSection" class="card hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h2 id="currentBinName" style="margin-bottom: 5px;"></h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <code id="currentBinUrl" style="color: #06B6D4; font-size: 14px;"></code>
+              <button class="btn btn-small btn-secondary" onclick="copyBinUrl()">Copy URL</button>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-small" onclick="refreshRequests()">🔄 Refresh</button>
+            <button class="btn btn-small btn-danger" onclick="deleteBin()" style="margin-left: 10px;">Delete</button>
+          </div>
+        </div>
+
+        <div id="binStats" style="color: #94A3B8; margin-bottom: 20px;"></div>
+
+        <h3>Captured Requests <span id="requestCount" style="color: #06B6D4;"></span></h3>
+        <div style="margin-bottom: 15px;">
+          <label style="color: #94A3B8; margin-right: 10px;">Filter by method:</label>
+          <select id="methodFilter" onchange="filterRequests()" style="padding: 8px; background: #0F172A; border: 1px solid #334155; border-radius: 6px; color: #F8FAFC;">
+            <option value="ALL">All Methods</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
+          </select>
+        </div>
+        <div id="requestsList"></div>
+        <div id="pagination" class="pagination"></div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
+  // ========== STATE MANAGEMENT ==========
+  let bins = JSON.parse(localStorage.getItem('requestbins') || '[]');
   let currentBin = null;
+  let autoRefreshInterval = null;
+  const REQUESTS_PER_PAGE = 10;
+  let currentPage = 1;
+  let allRequests = [];
+
+  // ========== TOAST NOTIFICATIONS ==========
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const icons = {
+      success: '✓',
+      error: '✕',
+      info: 'ℹ'
+    };
+
+    toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="closeToast(this)">×</button>
+            `;
+
+    container.appendChild(toast);
+
+    // Auto-remove after 4 seconds
+    setTimeout(() => {
+      removeToast(toast);
+    }, 4000);
+  }
+
+  function closeToast(button) {
+    removeToast(button.closest('.toast'));
+  }
+
+  function removeToast(toast) {
+    toast.classList.add('removing');
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }
+
+  // ========== BIN MANAGEMENT ==========
+  function saveBins() {
+    localStorage.setItem('requestbins', JSON.stringify(bins));
+  }
 
   async function createBin() {
-    const expiryHours = document.getElementById('expiryHours').value;
-    const maxRequests = document.getElementById('maxRequests').value;
+    const name = document.getElementById('binName').value.trim() || 'Unnamed Bin';
+    const expiryHours = parseInt(document.getElementById('expiryHours').value);
+    const maxRequests = parseInt(document.getElementById('maxRequests').value);
 
     try {
       const response = await fetch('/api/bins', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ expiryHours: parseInt(expiryHours), maxRequests: parseInt(maxRequests) })
+        body: JSON.stringify({ expiryHours, maxRequests })
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        currentBin = result.data;
-        document.getElementById('binUrl').textContent = currentBin.fullUrl;
-        document.getElementById('binUrl').href = currentBin.fullUrl;
-        document.getElementById('binResult').classList.remove('hidden');
+        const newBin = {
+          ...result.data,
+          name,
+          savedAt: new Date().toISOString()
+        };
 
-        // Start auto-refresh
-        startAutoRefresh();
+        bins.unshift(newBin);
+        saveBins();
+        renderBinsList();
+        selectBin(newBin);
+
+        showToast('Bin created successfully!', 'success');
+
+        // Clear form
+        document.getElementById('binName').value = '';
+        document.getElementById('expiryHours').value = '24';
+        document.getElementById('maxRequests').value = '1000';
       } else {
-        alert('Error creating bin: ' + result.message);
+        showToast(result.message || 'Error creating bin', 'error');
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      showToast('Network error: ' + error.message, 'error');
     }
+  }
+
+  function renderBinsList() {
+    const binsList = document.getElementById('binsList');
+
+    if (bins.length === 0) {
+      binsList.innerHTML = '<p style="color: #94A3B8; text-align: center;">No bins yet</p>';
+      return;
+    }
+
+    binsList.innerHTML = bins.map(bin => `
+                <div class="bin-item ${currentBin && currentBin.id === bin.id ? 'active' : ''}"
+                     onclick='selectBin(${JSON.stringify(bin)})'>
+                    <div class="bin-name">${bin.name}</div>
+                    <div class="bin-url-small">${bin.uniqueUrl}</div>
+                    <div class="bin-stats">
+                        ${bin.currentRequestCount || 0} requests
+                        · Expires ${new Date(bin.expiresAt).toLocaleDateString()}
+                    </div>
+                </div>
+            `).join('');
+  }
+
+  function filterBins() {
+    const search = document.getElementById('searchBins').value.toLowerCase();
+    const items = document.querySelectorAll('.bin-item');
+
+    items.forEach(item => {
+      const name = item.querySelector('.bin-name').textContent.toLowerCase();
+      const url = item.querySelector('.bin-url-small').textContent.toLowerCase();
+
+      if (name.includes(search) || url.includes(search)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  function selectBin(bin) {
+    currentBin = bin;
+
+    document.getElementById('noBinSelected').classList.add('hidden');
+    document.getElementById('binDetailsSection').classList.remove('hidden');
+
+    document.getElementById('currentBinName').textContent = bin.name;
+    document.getElementById('currentBinUrl').textContent = bin.fullUrl;
+
+    renderBinsList();
+    loadBinDetails();
+    startAutoRefresh();
   }
 
   async function loadBinDetails() {
@@ -251,30 +561,64 @@
       const result = await response.json();
 
       if (response.ok) {
-        displayRequests(result.data);
-      } else {
-        alert('Error loading requests: ' + result.message);
+        // Update bin in local storage
+        const binIndex = bins.findIndex(b => b.id === currentBin.id);
+        if (binIndex !== -1) {
+          bins[binIndex] = { ...bins[binIndex], ...result.data };
+          saveBins();
+        }
+
+        currentBin = { ...currentBin, ...result.data };
+        displayBinDetails(result.data);
+      } else if (response.status === 404 || response.status === 410) {
+        showToast('Bin not found or expired', 'error');
+        removeBinFromList(currentBin.id);
+        currentBin = null;
+        document.getElementById('binDetailsSection').classList.add('hidden');
+        document.getElementById('noBinSelected').classList.remove('hidden');
       }
     } catch (error) {
-      console.error('Error loading requests:', error);
+      console.error('Error loading bin:', error);
     }
   }
 
-  function displayRequests(binData) {
+  function displayBinDetails(binData) {
+    const stats = `
+        Requests: ${binData.currentRequestCount}/${binData.maxRequests}
+        · Created: ${new Date(binData.createdAt).toLocaleString()}
+        · Expires: ${new Date(binData.expiresAt).toLocaleString()}
+    `;
+    document.getElementById('binStats').textContent = stats;
+
+    currentBin = { ...currentBin, ...binData };
+    allRequests = binData.requests || [];
+
+    // Reset filter
+    document.getElementById('methodFilter').value = 'ALL';
+
+    currentPage = 1;
+    renderRequests();
+  }
+
+  function renderRequests() {
     const requestsList = document.getElementById('requestsList');
-    const requestsSection = document.getElementById('requestsSection');
     const requestCount = document.getElementById('requestCount');
 
-    if (binData.requests.length === 0) {
-      requestsList.innerHTML = '<p style="color: #94A3B8;">No requests captured yet. Send a request to your bin URL.</p>';
-      requestsSection.classList.remove('hidden');
+    if (allRequests.length === 0) {
+      requestsList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📬</div><p>No requests captured yet</p></div>';
+      requestCount.textContent = '';
+      document.getElementById('pagination').innerHTML = '';
       return;
     }
 
-    requestCount.textContent = `(${binData.currentRequestCount})`;
-    requestsSection.classList.remove('hidden');
+    requestCount.textContent = `(${allRequests.length})`;
 
-    requestsList.innerHTML = binData.requests.map(req => `
+    // Pagination
+    const startIndex = (currentPage - 1) * REQUESTS_PER_PAGE;
+    const endIndex = startIndex + REQUESTS_PER_PAGE;
+    const paginatedRequests = allRequests.slice(startIndex, endIndex);
+
+    requestsList.innerHTML = paginatedRequests.map(req => `
                 <div class="request-item">
                     <div>
                         <span class="request-method method-${req.method}">${req.method}</span>
@@ -282,7 +626,7 @@
                         <span style="color: #94A3B8; margin-left: 15px;">IP: ${req.ipAddress}</span>
                     </div>
 
-                    ${Object.keys(req.queryParams).length > 0 ? `
+                    ${Object.keys(req.queryParams || {}).length > 0 ? `
                         <details style="margin-top: 10px;">
                             <summary style="cursor: pointer; color: #06B6D4;">Query Params</summary>
                             <pre>${JSON.stringify(req.queryParams, null, 2)}</pre>
@@ -302,12 +646,50 @@
                     ` : ''}
                 </div>
             `).join('');
+
+    renderPagination();
+  }
+
+  function renderPagination() {
+    const totalPages = Math.ceil(allRequests.length / REQUESTS_PER_PAGE);
+    if (totalPages <= 1) {
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    let paginationHTML = `
+                <button class="page-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>
+            `;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+        paginationHTML += `
+                        <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>
+                    `;
+      } else if (i === currentPage - 3 || i === currentPage + 3) {
+        paginationHTML += `<span style="color: #94A3B8;">...</span>`;
+      }
+    }
+
+    paginationHTML += `
+                <button class="page-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+            `;
+
+    document.getElementById('pagination').innerHTML = paginationHTML;
+  }
+
+  function changePage(page) {
+    const totalPages = Math.ceil(allRequests.length / REQUESTS_PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+
+    currentPage = page;
+    renderRequests();
   }
 
   async function deleteBin() {
     if (!currentBin) return;
 
-    if (!confirm('Are you sure you want to delete this bin?')) return;
+    if (!confirm(`Delete bin "${currentBin.name}"?`)) return;
 
     try {
       const response = await fetch(`/api/bins/${currentBin.uniqueUrl}`, {
@@ -315,39 +697,82 @@
       });
 
       if (response.ok) {
-        alert('Bin deleted successfully');
-        location.reload();
+        showToast('Bin deleted successfully', 'success');
+        removeBinFromList(currentBin.id);
+        currentBin = null;
+        document.getElementById('binDetailsSection').classList.add('hidden');
+        document.getElementById('noBinSelected').classList.remove('hidden');
+        stopAutoRefresh();
       } else {
-        alert('Error deleting bin');
+        showToast('Error deleting bin', 'error');
       }
     } catch (error) {
-      alert('Error: ' + error.message);
+      showToast('Network error: ' + error.message, 'error');
     }
   }
 
-  function copyBinUrl() {
-    const url = document.getElementById('binUrl').textContent;
-    navigator.clipboard.writeText(url);
-    alert('Bin URL copied to clipboard!');
+  function removeBinFromList(binId) {
+    bins = bins.filter(b => b.id !== binId);
+    saveBins();
+    renderBinsList();
   }
 
-  let autoRefreshInterval;
+  function copyBinUrl() {
+    const url = currentBin.fullUrl;
+    navigator.clipboard.writeText(url);
+    showToast('Bin URL copied to clipboard!', 'success');
+  }
+
+  function refreshRequests() {
+    loadBinDetails();
+    showToast('Refreshed', 'info');
+  }
 
   function startAutoRefresh() {
-    // Refresh every 3 seconds
+    stopAutoRefresh();
     autoRefreshInterval = setInterval(() => {
-      loadBinDetails();
-    }, 3000);
+      if (currentBin && !document.hidden) {
+        loadBinDetails();
+      }
+    }, 5000); // 5 seconds
+  }
+
+  function stopAutoRefresh() {
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+    }
+  }
+
+  function filterRequests() {
+    const method = document.getElementById('methodFilter').value;
+
+    if (method === 'ALL') {
+      allRequests = (currentBin.requests || []);
+    } else {
+      allRequests = (currentBin.requests || []).filter(req => req.method === method);
+    }
+
+    currentPage = 1;
+    renderRequests();
   }
 
   // Stop auto-refresh when page is hidden
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      clearInterval(autoRefreshInterval);
+      stopAutoRefresh();
     } else if (currentBin) {
       startAutoRefresh();
     }
   });
+
+  // ========== INITIALIZATION ==========
+  renderBinsList();
+
+  // Auto-select first bin if available
+  if (bins.length > 0) {
+    selectBin(bins[0]);
+  }
 </script>
 </body>
 </html>

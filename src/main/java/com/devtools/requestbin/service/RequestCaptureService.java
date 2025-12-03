@@ -15,6 +15,7 @@ import com.devtools.requestbin.entity.CapturedRequest;
 import com.devtools.requestbin.exception.BinExpiredException;
 import com.devtools.requestbin.exception.BinLimitExceededException;
 import com.devtools.requestbin.exception.BinNotFoundException;
+import com.devtools.requestbin.exception.RateLimitExceededException;
 import com.devtools.requestbin.repository.BinRepository;
 import com.devtools.requestbin.repository.CapturedRequestRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,24 +34,30 @@ public class RequestCaptureService
 
   private final BinRepository binRepository;
   private final CapturedRequestRepository requestRepository;
+  private final RateLimitService rateLimitService;
+
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Transactional
-  public CapturedRequestResponse captureRequest(String uniqueUrl, HttpServletRequest request)
-  {
+  public CapturedRequestResponse captureRequest(String uniqueUrl, HttpServletRequest request) {
     // 1. Find the bin
     Bin bin = binRepository.findByUniqueUrl(uniqueUrl)
       .orElseThrow(() -> new BinNotFoundException(uniqueUrl));
 
     // 2. Check if bin is expired
-    if (bin.getExpiresAt().isBefore(LocalDateTime.now()))
-    {
+    if (bin.getExpiresAt().isBefore(LocalDateTime.now())) {
       throw new BinExpiredException(uniqueUrl, bin.getExpiresAt());
     }
 
-    // 3. Check if bin has reached max requests
-    if (bin.getCurrentRequestCount() >= bin.getMaxRequests())
-    {
+    // 3. Check rate limit (60 requests per minute per bin)
+    if (!rateLimitService.allowRequestCapture(bin.getId().toString())) {
+      throw new RateLimitExceededException(
+        "Rate limit exceeded for this bin. Maximum 60 requests per minute allowed."
+      );
+    }
+
+    // 4. Check if bin has reached max requests
+    if (bin.getCurrentRequestCount() >= bin.getMaxRequests()) {
       throw new BinLimitExceededException(uniqueUrl, bin.getMaxRequests(), bin.getCurrentRequestCount());
     }
 

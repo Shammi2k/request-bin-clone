@@ -5,6 +5,7 @@ import com.devtools.requestbin.dto.BinDetailsResponse;
 import com.devtools.requestbin.dto.BinResponse;
 import com.devtools.requestbin.dto.CreateBinRequest;
 import com.devtools.requestbin.service.BinService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,9 +27,11 @@ public class BinController
   private final BinService binService;
 
   @PostMapping
-  public ResponseEntity<ApiResponse<BinResponse>> createBin(@Valid @RequestBody CreateBinRequest request)
+  public ResponseEntity<ApiResponse<BinResponse>> createBin(
+    @Valid @RequestBody CreateBinRequest request, HttpServletRequest httpRequest)
   {
-    BinResponse bin = binService.createBin(request);
+    String ipAddress = getClientIpAddress(httpRequest);
+    BinResponse bin = binService.createBin(request, ipAddress);
     ApiResponse<BinResponse> response = ApiResponse.created(bin, "Bin created successfully");
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
@@ -55,5 +58,27 @@ public class BinController
     binService.deleteBin(uniqueUrl);
     ApiResponse<Void> response = ApiResponse.success(null, "Bin deleted successfully");
     return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Extract client IP address from request
+   * Handles cases where request is behind proxy/load balancer
+   */
+  private String getClientIpAddress(HttpServletRequest request) {
+    String ip = request.getHeader("X-Forwarded-For");
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("Proxy-Client-IP");
+    }
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getHeader("WL-Proxy-Client-IP");
+    }
+    if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+      ip = request.getRemoteAddr();
+    }
+    // If multiple IPs (comma-separated), take the first one
+    if (ip != null && ip.contains(",")) {
+      ip = ip.split(",")[0].trim();
+    }
+    return ip;
   }
 }
