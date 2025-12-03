@@ -2,25 +2,25 @@ type: collection.insomnia.rest/5.0
 schema_version: "5.1"
 name: request-bin-clone
 meta:
-  id: wrk_bab5cd97ae2644e5a7ea04090b919e1c
-  created: 1764649997584
-  modified: 1764649997584
+  id: wrk_8d779677cb7442e39616fcb4fd4b8298
+  created: 1764651095480
+  modified: 1764651095480
   description: ""
 collection:
   - name: Bin
     meta:
-      id: fld_be8290762b164c03bf89279f400d561a
+      id: fld_9bdaf51d3b5741399a84419ee02419b4
       created: 1764650459965
-      modified: 1764650492939
-      sortKey: -1764650459965
+      modified: 1764735864466
+      sortKey: -1764653382208
       description: ""
     children:
       - url: "{{ _.url }}/api/bins"
         name: CREATE Bin
         meta:
-          id: req_d687a8a5429f4bad96e5afc58f69a2b3
+          id: req_2a11deab87784ca08206eb807268aea9
           created: 1764650003481
-          modified: 1764650604188
+          modified: 1764736027372
           isPrivate: false
           description: ""
           sortKey: -1764650464604
@@ -29,7 +29,7 @@ collection:
           mimeType: application/json
           text: |-
             {
-                "expiryHours": 24,
+                "expiryHours": 1,
                 "maxRequests": 1000
             }
         headers:
@@ -39,6 +39,25 @@ collection:
             value: insomnia/12.1.0
             description: ""
             disabled: false
+        scripts:
+          afterResponse: |-
+            
+            insomnia.test('Check if status is 201', () => {
+                insomnia.expect(insomnia.response.code).to.eql(201);
+            });
+
+
+            const jsonBody = insomnia.response.json();
+
+            insomnia.test('Check initial request count is 0', () => {
+            	insomnia.expect(jsonBody.data.currentRequestCount).to.eql(0);
+            });
+
+            insomnia.test('Check unique url length is 8', () => {
+            	insomnia.expect(jsonBody.data.uniqueUrl.length).to.eql(8);
+            });
+
+            insomnia.globals.set("uniqueUrl", jsonBody.data.uniqueUrl);
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -47,12 +66,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.url }}/api/bins/bb638f2c"
+      - url: "{{ _.url }}/api/bins/{{ _.uniqueUrl }}"
         name: GET Bin
         meta:
-          id: req_4780acc85e4f4dd4b2accacc89920a46
+          id: req_f82845476f094305b7aaf8ccb5f1a9dc
           created: 1764650475431
-          modified: 1764650594715
+          modified: 1764685217586
           isPrivate: false
           description: ""
           sortKey: -1764650464504
@@ -70,12 +89,12 @@ collection:
             send: true
             store: true
           rebuildPath: true
-      - url: "{{ _.url }}/api/bins/bb638f2c"
+      - url: "{{ _.url }}/api/bins/{{ _.uniqueUrl }}"
         name: DELETE Bin
         meta:
-          id: req_d240250eb65b4db9939f712c2cf6999f
+          id: req_14a23800c2604404ae18e85cee75a8a1
           created: 1764650608006
-          modified: 1764650651269
+          modified: 1764685325996
           isPrivate: false
           description: ""
           sortKey: -1764650464404
@@ -85,6 +104,266 @@ collection:
             value: insomnia/12.1.0
             description: ""
             disabled: false
+        scripts:
+          afterResponse: |+
+            
+            insomnia.test('Check if status is 204', () => {
+                insomnia.expect(insomnia.response.code).to.eql(200);
+            });
+
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/api/bins/{{ _.uniqueUrl }}/details"
+        name: GET Bin details
+        meta:
+          id: req_815e10639d6147b6b8fab69726c68854
+          created: 1764653802698
+          modified: 1764685233758
+          isPrivate: false
+          description: ""
+          sortKey: -1764650464454
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        scripts:
+          afterResponse: |-
+            
+            const jsonBody = insomnia.response.json();
+
+            insomnia.test('Check if number of requests is 6', () => {
+                insomnia.expect(jsonBody.data.requests.length).to.eql(6);
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Request Capture
+    meta:
+      id: fld_9f265809cb8f4d2294ded13c7433f783
+      created: 1764653382007
+      modified: 1764667517514
+      sortKey: -1764653382158
+      description: ""
+    children:
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: Simple GET
+        meta:
+          id: req_4c03c99e530f45ccbb241583f5d52e50
+          created: 1764653432283
+          modified: 1764664216193
+          isPrivate: false
+          description: ""
+          sortKey: -1764653432283
+        method: GET
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: GET with query params
+        meta:
+          id: req_cc0a3f8e857e46008f609ad4afe95e01
+          created: 1764653484731
+          modified: 1764664211540
+          isPrivate: false
+          description: ""
+          sortKey: -1764653484731
+        method: GET
+        parameters:
+          - name: name
+            value: John
+            disabled: false
+          - name: age
+            value: "30"
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: POST with JSON body
+        meta:
+          id: req_981c9db1d4974a83942b1fae5489f0c3
+          created: 1764653521443
+          modified: 1764664206297
+          isPrivate: false
+          description: ""
+          sortKey: -1764653521443
+        method: POST
+        body:
+          mimeType: application/json
+          text: '{"username": "testuser", "email": "testundefined'
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: POST with form data
+        meta:
+          id: req_e3ed82d51d9e48dbb6f5ede25b91a47c
+          created: 1764653555061
+          modified: 1764664200003
+          isPrivate: false
+          description: ""
+          sortKey: -1764653555061
+        method: POST
+        body:
+          mimeType: application/x-www-form-urlencoded
+          params:
+            - name: username
+              value: testuser
+            - name: password
+              value: secret123
+        headers:
+          - name: Content-Type
+            value: application/x-www-form-urlencoded
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: Simple PUT
+        meta:
+          id: req_3048e6deb93746f3810b13fb890f40ba
+          created: 1764653583194
+          modified: 1764664194155
+          isPrivate: false
+          description: ""
+          sortKey: -1764653583194
+        method: PUT
+        body:
+          mimeType: application/json
+          text: '{"id": 1, "status": "updated"}'
+        headers:
+          - name: Content-Type
+            value: application/json
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/b/{{ _.uniqueUrl }}"
+        name: Simple DELETE
+        meta:
+          id: req_8c3c3aa5e59b46cba31676b78bcbe6cb
+          created: 1764653611790
+          modified: 1764664187968
+          isPrivate: false
+          description: ""
+          sortKey: -1764653611790
+        method: DELETE
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+  - name: Exception Handling
+    meta:
+      id: fld_233e47e7785747be97cad05b25fe56ac
+      created: 1764667459148
+      modified: 1764685311800
+      sortKey: -1764653382108
+      description: ""
+    children:
+      - url: "{{ _.url }}/api/bins/nonexistent"
+        name: 404 Bin Not Found
+        meta:
+          id: req_ac6c46d0b7514caa9d3d633215c315df
+          created: 1764667536518
+          modified: 1764668085777
+          isPrivate: false
+          description: ""
+          sortKey: -1764667536518
+        method: GET
+        scripts:
+          afterResponse: >-
+            const jsonBody = insomnia.response.json();
+
+
+
+            insomnia.test('Check if status is 404', () => {
+                insomnia.expect(insomnia.response.code).to.eql(404);
+            });
+
+
+            insomnia.test('Check if message is correct', () => {
+                insomnia.expect(jsonBody.message).to.eql('Bin not found with URL: nonexistent');
+            });
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.url }}/api/bins"
+        name: 400 Validation Failed
+        meta:
+          id: req_0ebef34402b842c1866973a6ca1e101a
+          created: 1764668129087
+          modified: 1764668459864
+          isPrivate: false
+          description: ""
+          sortKey: -1764668129087
+        method: POST
+        body:
+          mimeType: application/json
+          text: '{"expiryHours": 1222, "maxRequests": 1000}'
+        headers:
+          - name: Content-Type
+            value: application/json
+        scripts:
+          afterResponse: >-
+            const jsonBody = insomnia.response.json();
+
+
+            insomnia.test('Check if status is 400', () => {
+                insomnia.expect(insomnia.response.code).to.eql(400);
+            });
+
+
+            insomnia.test('Check if message is correct', () => {
+                insomnia.expect(jsonBody.message).to.eql('Invalid input parameters');
+            });
         settings:
           renderRequestBody: true
           encodeUrl: true
@@ -96,13 +375,13 @@ collection:
 cookieJar:
   name: Default Jar
   meta:
-    id: jar_ecc7cdd239690e3a6b5fb998a5aefb846c7e3105
+    id: jar_6a663c62b2f749489cd26a92d470b3c6
     created: 1764649997627
-    modified: 1764649997627
+    modified: 1764735864458
 environments:
-  name: Base Environment
+  name: Collection Env
   meta:
-    id: env_ecc7cdd239690e3a6b5fb998a5aefb846c7e3105
+    id: env_fe016771d605487d928543590cd777a3
     created: 1764649997622
-    modified: 1764649997622
+    modified: 1764735864463
     isPrivate: false
