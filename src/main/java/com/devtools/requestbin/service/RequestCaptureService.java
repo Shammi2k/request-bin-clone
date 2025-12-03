@@ -12,6 +12,9 @@ import java.util.stream.Collectors;
 import com.devtools.requestbin.dto.CapturedRequestResponse;
 import com.devtools.requestbin.entity.Bin;
 import com.devtools.requestbin.entity.CapturedRequest;
+import com.devtools.requestbin.exception.BinExpiredException;
+import com.devtools.requestbin.exception.BinLimitExceededException;
+import com.devtools.requestbin.exception.BinNotFoundException;
 import com.devtools.requestbin.repository.BinRepository;
 import com.devtools.requestbin.repository.CapturedRequestRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,18 +40,18 @@ public class RequestCaptureService
   {
     // 1. Find the bin
     Bin bin = binRepository.findByUniqueUrl(uniqueUrl)
-      .orElseThrow(() -> new RuntimeException("Bin not found: " + uniqueUrl));
+      .orElseThrow(() -> new BinNotFoundException(uniqueUrl));
 
     // 2. Check if bin is expired
     if (bin.getExpiresAt().isBefore(LocalDateTime.now()))
     {
-      throw new RuntimeException("Bin has expired");
+      throw new BinExpiredException(uniqueUrl, bin.getExpiresAt());
     }
 
     // 3. Check if bin has reached max requests
     if (bin.getCurrentRequestCount() >= bin.getMaxRequests())
     {
-      throw new RuntimeException("Bin has reached maximum request limit");
+      throw new BinLimitExceededException(uniqueUrl, bin.getMaxRequests(), bin.getCurrentRequestCount());
     }
 
     // 4. Extract request details
@@ -83,7 +86,7 @@ public class RequestCaptureService
   public List<CapturedRequestResponse> getRequestsForBin(String uniqueUrl)
   {
     Bin bin = binRepository.findByUniqueUrl(uniqueUrl)
-      .orElseThrow(() -> new RuntimeException("Bin not found: " + uniqueUrl));
+      .orElseThrow(() -> new BinNotFoundException(uniqueUrl));
 
     List<CapturedRequest> requests = requestRepository.findByBinIdOrderByTimestampDesc(bin.getId());
 

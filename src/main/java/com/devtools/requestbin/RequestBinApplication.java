@@ -2,12 +2,16 @@ package com.devtools.requestbin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class RequestBinApplication {
+@EnableScheduling
+public class RequestBinApplication
+{
 
-	public static void main(String[] args) {
-		SpringApplication.run(RequestBinApplication.class, args);
-	}
+  public static void main(String[] args)
+  {
+    SpringApplication.run(RequestBinApplication.class, args);
+  }
 
 }
